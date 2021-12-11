@@ -97,7 +97,7 @@ function Nav() {
           <Button
             className="ml-2"
             onClick={() => {
-              authenticate({ provider: 'metamask' });
+              authenticate();
             }}
           >
             <img src="/icons/metamask.webp" height="20" width="20" />
