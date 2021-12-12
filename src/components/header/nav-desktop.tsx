@@ -15,7 +15,8 @@ function Nav() {
   const [address, setAddress] = useState('');
   const [isNeedAnimate, setIsNeedAnimate] = useState(false);
   const router = useRouter();
-  const { authenticate, isAuthenticated, user, logout } = useMoralis();
+  const { authenticate, isAuthenticated, user, logout, isAuthenticating } =
+    useMoralis();
   const [isBtnExpaned, setIsBtnExpanded] = useState(!isAuthenticated);
 
   const props = useSpring({
@@ -55,24 +56,30 @@ function Nav() {
   useEffect(() => {
     setActiveTab(getTabIndex());
   }, []);
+
   useEffect(() => {
     const fullAddress = user?.get('ethAddress') || '';
-    if (!fullAddress) return;
+    if (!fullAddress) {
+      setIsBtnExpanded(true);
+      return;
+    }
     const shortAddress = `${fullAddress.substring(0, 4)}...${fullAddress.substr(
       fullAddress.length - 4
     )}`;
 
     setAddress(shortAddress);
+    setIsBtnExpanded(false);
   }, [address, user]);
+
   const go = (path: string) => {
     router.push(path);
   };
 
   return (
-    <div className="p-4 flex justify-between">
+    <div className="p-4 flex justify-between overflow-hidden">
       <Link href={routes.HOME.path}>
         <a
-          className="flex items-baseline cursor-pointer no-underline"
+          className={`flex items-baseline cursor-pointer no-underline`}
           title={routes.HOME.name}
         >
           <h1 className="text-2xl font-black no-underline">PLBN</h1>
@@ -114,26 +121,30 @@ function Nav() {
               ? props
               : { width: !isAuthenticated ? '208px' : '138px' }
           }
-          onClick={async () => {
-            setIsNeedAnimate(true);
-            if (isAuthenticated) {
-              logout();
-              setIsBtnExpanded(!isBtnExpaned);
-            } else {
-              await authenticate();
-              setIsBtnExpanded(!isBtnExpaned);
-            }
-          }}
         >
           {isAuthenticated ? (
-            <Button className="ml-2" outlined>
+            <Button
+              className="ml-2"
+              outlined
+              onClick={async () => {
+                setIsNeedAnimate(true);
+                logout();
+              }}
+            >
               <animated.span className="normal-case mr-1">
                 {address}
               </animated.span>
               <RiLogoutBoxRFill size="20" />
             </Button>
           ) : (
-            <Button className="ml-2">
+            <Button
+              className="ml-2"
+              disabled={isAuthenticating}
+              onClick={async () => {
+                setIsNeedAnimate(true);
+                await authenticate();
+              }}
+            >
               <img src="/icons/metamask.webp" height="20" width="20" />
               <animated.div className="normal-case ml-1 truncate">
                 Đăng nhập với MetaMask
