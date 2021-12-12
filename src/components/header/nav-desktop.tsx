@@ -5,6 +5,7 @@ import { useRouter } from 'next/router';
 import { RiLogoutBoxRFill, RiShoppingCartLine } from 'react-icons/ri';
 import { VscHome, VscPreview, VscGift } from 'react-icons/vsc';
 import { useMoralis } from 'react-moralis';
+import { useSpring, animated } from 'react-spring';
 import { Tabs, Tab, Button } from 'ui-neumorphism';
 
 import { routes } from '../../router/index';
@@ -12,8 +13,28 @@ import { routes } from '../../router/index';
 function Nav() {
   const [activeTab, setActiveTab] = useState(0);
   const [address, setAddress] = useState('');
+  const [isNeedAnimate, setIsNeedAnimate] = useState(false);
   const router = useRouter();
   const { authenticate, isAuthenticated, user, logout } = useMoralis();
+  const [isBtnExpaned, setIsBtnExpanded] = useState(!isAuthenticated);
+
+  const props = useSpring({
+    to: {
+      width: isBtnExpaned ? '208px' : '138px',
+      color: isBtnExpaned ? 'unset' : 'unset',
+    },
+    from: {
+      width: isBtnExpaned ? '138px' : '208px',
+      color: isBtnExpaned ? 'white' : 'white',
+    },
+  });
+
+  // const props = useSpring({
+  //   to: { opacity: 1, minWidth: isAuthenticated && 'auto' },
+  //   from: { opacity: 0, minWidth: isAuthenticated && '200px' },
+  //   delay: 200,
+  // });
+
   function getTabIndex() {
     switch (router.pathname) {
       case routes.HOME.path:
@@ -30,6 +51,7 @@ function Nav() {
         return 0;
     }
   }
+
   useEffect(() => {
     setActiveTab(getTabIndex());
   }, []);
@@ -86,26 +108,61 @@ function Nav() {
             </div>
           </Tab>
         </Tabs>
-        {isAuthenticated ? (
-          <div>
+        <animated.div
+          style={
+            isNeedAnimate
+              ? props
+              : { width: !isAuthenticated ? '208px' : '138px' }
+          }
+          onClick={async () => {
+            setIsNeedAnimate(true);
+            if (isAuthenticated) {
+              logout();
+              setIsBtnExpanded(!isBtnExpaned);
+            } else {
+              await authenticate();
+              setIsBtnExpanded(!isBtnExpaned);
+            }
+          }}
+        >
+          {isAuthenticated ? (
+            <Button className="ml-2" outlined>
+              <animated.span className="normal-case mr-1">
+                {address}
+              </animated.span>
+              <RiLogoutBoxRFill size="20" />
+            </Button>
+          ) : (
+            <Button className="ml-2">
+              <img src="/icons/metamask.webp" height="20" width="20" />
+              <animated.div className="normal-case ml-1 truncate">
+                Đăng nhập với MetaMask
+              </animated.div>
+            </Button>
+          )}
+        </animated.div>
+        {/* {isAuthenticated ? (
+          <animated.div style={props}>
             <Button className="ml-2" outlined onClick={() => logout()}>
               <span className="normal-case mr-1">{address}</span>
               <RiLogoutBoxRFill size="20" />
             </Button>
-          </div>
+          </animated.div>
         ) : (
-          <Button
-            className="ml-2"
-            onClick={() => {
-              authenticate();
-            }}
-          >
-            <img src="/icons/metamask.webp" height="20" width="20" />
-            <div className="normal-case ml-1 truncate">
-              Đăng nhập với MetaMask
-            </div>
-          </Button>
-        )}
+          <animated.div style={props}>
+            <Button
+              className="ml-2"
+              onClick={() => {
+                authenticate();
+              }}
+            >
+              <img src="/icons/metamask.webp" height="20" width="20" />
+              <div className="normal-case ml-1 truncate">
+                Đăng nhập với MetaMask
+              </div>
+            </Button>
+          </animated.div>
+        )} */}
       </div>
     </div>
   );
