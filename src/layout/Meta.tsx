@@ -18,6 +18,11 @@ const Meta = (props: IMetaProps) => {
       <Head>
         <meta charSet="UTF-8" key="charset" />
         <meta
+          name="keywords"
+          content="plbn, phan lo ban nen, metaverse, phan lo ban nen metaverse, game blockchan, plbn p2e, game p2e, pay to earn"
+        />
+        <meta name="author" content="Syamlal CM" />
+        <meta
           name="viewport"
           content="width=device-width,initial-scale=1"
           key="viewport"
@@ -51,6 +56,20 @@ const Meta = (props: IMetaProps) => {
         title={props.title}
         description={props.description}
         canonical={props.canonical}
+        additionalMetaTags={[
+          {
+            property: 'dc:creator',
+            content: 'Jane Doe',
+          },
+          {
+            name: 'application-name',
+            content: 'NextSeo',
+          },
+          {
+            httpEquiv: 'x-ua-compatible',
+            content: 'IE=edge; chrome=1',
+          },
+        ]}
         openGraph={{
           title: props.title,
           description: props.description,

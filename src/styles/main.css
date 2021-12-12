@@ -19,7 +19,7 @@ button{
   letter-spacing: 0.5px !important;
 }
 
-h1{
+h1, h2{
   font-family: system-ui;
   font-weight: 200;
 }
